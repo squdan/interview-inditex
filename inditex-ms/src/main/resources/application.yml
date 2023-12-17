@@ -1,0 +1,32 @@
+# API: Configuration
+server.port: 8081
+logging.level:
+  root: INFO
+
+# COMMON: Spring configuration
+spring:
+  # App Spring Configuration
+  application.name: ms
+  profiles.active: dev
+  main.allow-circular-references: true
+  
+  # Database
+  datasource:
+    #url: jdbc:h2:file:./app/ms-database # Persisting H2 database into a file
+    url: jdbc:h2:mem:ms-database;TIME ZONE=UTC # H2 database in memory, generated in each execution
+    driverClassName: org.h2.Driver
+    username: ms_user
+    password: ms_password
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate.ddl-auto: update
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+# API: Security
+app.security:
+  secret: securityTest
+  expiration: 1d # Expiration time units supported (d, h, m, s, ms, us, ns)
