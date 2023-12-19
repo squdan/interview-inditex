@@ -1,8 +1,8 @@
 package es.dtr.job.interview.commons.test.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.dtr.job.interview.commons.api.crud.CrudUpdateController;
-import es.dtr.job.interview.commons.service.crud.CrudService;
+import es.dtr.job.interview.commons.hexagonal.application.rest.crud.CrudUpdateController;
+import es.dtr.job.interview.commons.hexagonal.domain.service.crud.CrudService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
@@ -27,7 +27,7 @@ public interface CrudUpdateControllerTest<T, K, ID> {
     /**
      * Mocked CRUD Service.
      */
-    CrudService<T, K, ID> getCrudService();
+    CrudService<K, ID> getCrudService();
 
     /**
      * Base controller path.
@@ -46,7 +46,7 @@ public interface CrudUpdateControllerTest<T, K, ID> {
     /**
      * Single DTO element to return in mocked service.
      */
-    T getElement();
+    T getElementDto();
 
     @Test
     @WithMockUser
@@ -59,7 +59,7 @@ public interface CrudUpdateControllerTest<T, K, ID> {
                 MockMvcRequestBuilders
                         .put(getBasePath() + CrudUpdateController.ENDPOINT_UPDATE, getRequestId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(getObjectMapper().writeValueAsString(getElement()))
+                        .content(getObjectMapper().writeValueAsString(getElementDto()))
         );
 
         // Response validation
@@ -75,7 +75,7 @@ public interface CrudUpdateControllerTest<T, K, ID> {
                 MockMvcRequestBuilders
                         .put(getBasePath() + CrudUpdateController.ENDPOINT_UPDATE, getRequestId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(getObjectMapper().writeValueAsString(getElement()))
+                        .content(getObjectMapper().writeValueAsString(getElementDto()))
         );
 
         // Response validation

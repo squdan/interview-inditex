@@ -1,58 +1,29 @@
 package es.dtr.job.interview.inditex.ms.domain.service.price;
 
-import es.dtr.job.interview.commons.api.querydsl.QueryDslFilter;
-import es.dtr.job.interview.commons.api.querydsl.QueryDslOperators;
-import es.dtr.job.interview.commons.api.querydsl.QueryDslUtils;
-import es.dtr.job.interview.commons.service.crud.CrudService;
-import es.dtr.job.interview.inditex.ms.adapter.out.database.hibernate.PriceRepository;
+import es.dtr.job.interview.commons.hexagonal.domain.service.crud.CrudService;
+import es.dtr.job.interview.commons.hexagonal.domain.service.querydsl.QueryDslFilter;
+import es.dtr.job.interview.commons.hexagonal.domain.service.querydsl.QueryDslOperators;
 import es.dtr.job.interview.inditex.ms.domain.entity.PriceEntity;
-import jakarta.validation.constraints.NotNull;
+import es.dtr.job.interview.inditex.ms.domain.repository.PriceDomainRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Service
 @RequiredArgsConstructor
-public class PriceService implements CrudService<PriceDto, PriceEntity, Long> {
+public class PriceService implements CrudService<PriceEntity, Long> {
 
-    // Dependencias
-    private final PriceMapper mapper;
-    private final PriceRepository repository;
-    private final QueryDslUtils queryDslUtils;
+    // Dependencies
+    private final PriceDomainRepository repository;
 
-    @Override
-    public List<PriceDto> findBy(final List<String> filters) {
-        return findBy(filters, null);
-    }
-
-    @Override
-    public List<PriceDto> findBy(final List<String> filters, final Pageable pageable) {
-        List<PriceDto> result = new ArrayList<>();
-
-        // Prepare received queryDslFilters
-        final List<QueryDslFilter> queryDslFilters = queryDslUtils.prepareFilters(filters);
-
-        // Execute search
-        final List<PriceEntity> mayElements = repository.findAll(PriceEntity.class, queryDslFilters, pageable);
-
-        if (CollectionUtils.isNotEmpty(mayElements)) {
-            result = mapper.entityToDto(mayElements);
-        }
-
-        return result;
-    }
-
-    public PriceDto getWith(@NotNull final Long productId, @NotNull final Long brandId, @NotNull final Instant date) {
-        PriceDto result;
+    public PriceEntity getWith(final Long productId, final Long brandId, final Instant date) {
+        PriceEntity result;
 
         // Generate filters with received information
         final List<QueryDslFilter> filters = List.of(
@@ -63,10 +34,10 @@ public class PriceService implements CrudService<PriceDto, PriceEntity, Long> {
         );
 
         // Will use sorting from pagination to get price with highest priority value
-        final Pageable pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "priority"));
+        final Pageable pageable = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "priority"));
 
         // Search using filters
-        final List<PriceDto> mayResults = findBy(filters.stream().map(QueryDslFilter::toString).toList(), pageable);
+        final List<PriceEntity> mayResults = findBy(filters, pageable);
 
         if (CollectionUtils.isNotEmpty(mayResults)) {
             result = mayResults.get(0);

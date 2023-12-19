@@ -1,7 +1,7 @@
 package es.dtr.job.interview.commons.it.controller;
 
-import es.dtr.job.interview.commons.api.crud.CrudGetController;
-import es.dtr.job.interview.commons.service.crud.CrudService;
+import es.dtr.job.interview.commons.hexagonal.application.rest.crud.CrudGetController;
+import es.dtr.job.interview.commons.hexagonal.domain.service.crud.CrudService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -42,34 +42,9 @@ public interface CrudGetControllerIT<T, K, ID> {
     ID getRequestIdNotExists();
 
     /**
-     * ResultMatcher to validate operation GET_ALL results.
-     */
-    List<ResultMatcher> getAllTestMatchers();
-
-    /**
      * ResultMatcher to validate operation GET results.
      */
     List<ResultMatcher> getByIdTestMatchers();
-
-    @Test
-    @WithMockUser
-    default void test_getAll_whenData_thenResponseWithData() throws Exception {
-        // Test execution
-        final ResultActions restResponse = getMockMvc().perform(
-                MockMvcRequestBuilders
-                        .get(getBasePath() + CrudGetController.ENDPOINT_GET_ALL)
-        );
-
-        // Response validation
-        restResponse
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        if (CollectionUtils.isNotEmpty(getAllTestMatchers())) {
-            for (ResultMatcher matcher : getAllTestMatchers()) {
-                restResponse.andExpect(matcher);
-            }
-        }
-    }
 
     @Test
     @WithMockUser

@@ -1,8 +1,8 @@
 package es.dtr.job.interview.inditex.ms;
 
 import es.dtr.job.interview.commons.TestData;
-import es.dtr.job.interview.commons.data.Roles;
-import es.dtr.job.interview.inditex.ms.configuration.security.UserDetailsCustom;
+import es.dtr.job.interview.commons.hexagonal.domain.entity.type.Roles;
+import es.dtr.job.interview.inditex.ms.infrastructure.configuration.security.UserDetailsCustom;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

@@ -1,8 +1,9 @@
 package es.dtr.job.interview.commons.test.controller;
 
 import es.dtr.job.interview.commons.TestData;
-import es.dtr.job.interview.commons.api.crud.CrudFindController;
-import es.dtr.job.interview.commons.service.crud.CrudService;
+import es.dtr.job.interview.commons.hexagonal.application.rest.crud.CrudControllerMapper;
+import es.dtr.job.interview.commons.hexagonal.application.rest.crud.CrudFindController;
+import es.dtr.job.interview.commons.hexagonal.domain.service.crud.CrudService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,12 @@ public interface CrudFindControllerTest<T, K, ID> {
     /**
      * Mocked CRUD Service.
      */
-    CrudService<T, K, ID> getCrudService();
+    CrudService<K, ID> getCrudService();
+
+    /**
+     * Mocked CRUD Mapper.
+     */
+    CrudControllerMapper<T, K> getCrudMapper();
 
     /**
      * Base controller path.
@@ -37,7 +43,12 @@ public interface CrudFindControllerTest<T, K, ID> {
     /**
      * List of DTO elements to return in mocked service.
      */
-    List<T> getElements();
+    List<T> getElementsDto();
+
+    /**
+     * List of Entity elements to return in mocked service.
+     */
+    List<K> getElementsEntity();
 
     /**
      * List of ResultMatchers to validate REST service response of List elements.
@@ -48,7 +59,7 @@ public interface CrudFindControllerTest<T, K, ID> {
     @WithMockUser
     default void test_findBy_whenNoMatch_thenEmptyResponse() throws Exception {
         // Mocks
-        Mockito.when(getCrudService().findBy(Mockito.anyList())).thenReturn(new ArrayList<>());
+        Mockito.when(getCrudService().findBy(Mockito.any(), Mockito.any())).thenReturn(new ArrayList<>());
 
         // Test execution
         final ResultActions restResponse = getMockMvc().perform(
@@ -65,9 +76,35 @@ public interface CrudFindControllerTest<T, K, ID> {
 
     @Test
     @WithMockUser
-    default void test_findBy_whenData_thenResponseWithData() throws Exception {
+    default void test_findBy_whenNoFilters_thenResponseWithAllElements() throws Exception {
         // Mocks
-        Mockito.when(getCrudService().findBy(TestData.TEST_FILTERS_LIST_STRING)).thenReturn(getElements());
+        Mockito.when(getCrudService().findBy(Mockito.any(), Mockito.any())).thenReturn(getElementsEntity());
+        Mockito.when(getCrudMapper().domainEntityToDto(this.getElementsEntity())).thenReturn(this.getElementsDto());
+
+        // Test execution
+        final ResultActions restResponse = getMockMvc().perform(
+                MockMvcRequestBuilders
+                        .get(getBasePath() + CrudFindController.ENDPOINT_FIND_BY)
+        );
+
+        // Response validation
+        restResponse
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(getElementsDto().size())));
+
+        if (CollectionUtils.isNotEmpty(getElementsTestMatchers())) {
+            for (ResultMatcher matcher : getElementsTestMatchers()) {
+                restResponse.andExpect(matcher);
+            }
+        }
+    }
+
+    @Test
+    @WithMockUser
+    default void test_findBy_whenCorrectFilters_thenResponseWithData() throws Exception {
+        // Mocks
+        Mockito.when(getCrudService().findBy(Mockito.any(), Mockito.any())).thenReturn(getElementsEntity());
+        Mockito.when(getCrudMapper().domainEntityToDto(this.getElementsEntity())).thenReturn(this.getElementsDto());
 
         // Test execution
         final ResultActions restResponse = getMockMvc().perform(
@@ -79,7 +116,7 @@ public interface CrudFindControllerTest<T, K, ID> {
         // Response validation
         restResponse
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(getElements().size())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(getElementsDto().size())));
 
         if (CollectionUtils.isNotEmpty(getElementsTestMatchers())) {
             for (ResultMatcher matcher : getElementsTestMatchers()) {

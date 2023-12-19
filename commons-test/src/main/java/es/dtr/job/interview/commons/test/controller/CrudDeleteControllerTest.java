@@ -1,7 +1,7 @@
 package es.dtr.job.interview.commons.test.controller;
 
-import es.dtr.job.interview.commons.api.crud.CrudDeleteController;
-import es.dtr.job.interview.commons.service.crud.CrudService;
+import es.dtr.job.interview.commons.hexagonal.application.rest.crud.CrudDeleteController;
+import es.dtr.job.interview.commons.hexagonal.domain.service.crud.CrudService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -20,7 +20,7 @@ public interface CrudDeleteControllerTest<T, K, ID> {
     /**
      * Mocked CRUD Service.
      */
-    CrudService<T, K, ID> getCrudService();
+    CrudService<K, ID> getCrudService();
 
     /**
      * Base controller path.

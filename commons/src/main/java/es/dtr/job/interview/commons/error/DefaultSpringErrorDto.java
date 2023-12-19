@@ -1,5 +1,6 @@
 package es.dtr.job.interview.commons.error;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -16,6 +17,7 @@ import lombok.Value;
 @Builder
 public class DefaultSpringErrorDto implements Serializable {
 
+	@Serial
 	private static final long serialVersionUID = 4110038566194054803L;
 
 	Date timestamp;

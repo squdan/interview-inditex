@@ -13,7 +13,7 @@ VALUES (
     'Daniel',
     'Torres Rojano',
     'test.admin@gmail.com',
-    '+3466777888',
+    '+34666777888',
     now(),
     now()
 );

@@ -1,30 +1,24 @@
 package es.dtr.job.interview.commons.test.service;
 
-import es.dtr.job.interview.commons.data.CrudRepository;
-import es.dtr.job.interview.commons.service.crud.CrudMapper;
-import es.dtr.job.interview.commons.service.crud.CrudService;
+import es.dtr.job.interview.commons.hexagonal.domain.repository.CrudDomainRepository;
+import es.dtr.job.interview.commons.hexagonal.domain.service.crud.CrudService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.Objects;
 
-public interface CrudCreateServiceTest<T, K, ID> {
+public interface CrudCreateServiceTest<T, ID> {
 
     /**
      * CRUD Service to test.
      */
-    CrudService<T, K, ID> getCrudService();
+    CrudService<T, ID> getCrudService();
 
     /**
      * Mocked CRUD Repository.
      */
-    CrudRepository<K, ID> getCrudRepository();
-
-    /**
-     * Mocked CRUD Mapper.
-     */
-    CrudMapper<K, T> getCrudMapper();
+    CrudDomainRepository<T, ID> getCrudRepository();
 
     /**
      * Request ID example for service.
@@ -38,21 +32,15 @@ public interface CrudCreateServiceTest<T, K, ID> {
     /**
      * Entity Instance.
      */
-    K getElementEntity();
-
-    /**
-     * DTO Instance.
-     */
-    T getElementDto();
+    T getElementEntity();
 
     @Test
     default void test_create_whenOk_thenReturnId() {
         // Mocks
-        Mockito.when(getCrudMapper().dtoToEntity(getElementDto())).thenReturn(getElementEntity());
-        Mockito.when(getCrudRepository().save(getElementEntity())).thenReturn(getElementEntity());
+        Mockito.when(getCrudRepository().create(getElementEntity())).thenReturn(getRequestId());
 
         // Test execution
-        final ID elementId = getCrudService().create(getElementDto());
+        final ID elementId = getCrudService().create(getElementEntity());
 
         // Response validation
         Assertions.assertTrue(Objects.nonNull(elementId));

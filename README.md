@@ -116,8 +116,8 @@ Comprueban el comportamiento del código incluyendo la interacción entre las di
 inditex-ms/src/it
 ```
 
-En el test "es.dtr.job.interview.inditex.ms.adapter.in.price.PriceControllerIT" se podrán encontrar las pruebas de
-recuperación de precios con los datos indicados en el archivo del ejercicio "TestJava2020.txt".
+En el test "inditex-ms/src/it/java/es/dtr/job/interview/inditex/ms/application/rest/price/PriceControllerIT.java" se
+podrán encontrar las pruebas de recuperación de precios con los datos indicados en el archivo del ejercicio.
 
 ## Funcionales
 
@@ -140,10 +140,3 @@ A continuación se puede ver la ejecución de las pruebas programadas solicitada
 
    Esto no es un problema que afecte a la funcionalidad de la aplicación, pero es un comportamiento extraño que conviene
    tener identificado.
-
-2. Actualmente en el servicio UPDATE del CRUD, hay que enviar toda la información de la entidad, incluso la que no se
-   quiera cambiar, esto no debería ser así, deberían enviarse sólo los datos a modificar. En futuras mejoras habría que
-   implementar una lógica que recuperara la entidad existente y la fusionara con los cambios recibidos.
-
-   Este error se ha resuelto para la entidad usuario, añadiendo el método merge a la entidad, la idea sería crear una
-   interfaz o clase base con este método que se utilizara de forma genérica desde CrudService para el update.

@@ -1,8 +1,8 @@
 package es.dtr.job.interview.commons.test.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.dtr.job.interview.commons.api.crud.CrudCreateController;
-import es.dtr.job.interview.commons.service.crud.CrudService;
+import es.dtr.job.interview.commons.hexagonal.application.rest.crud.CrudCreateController;
+import es.dtr.job.interview.commons.hexagonal.domain.service.crud.CrudService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -28,7 +28,7 @@ public interface CrudCreateControllerTest<T, K, ID> {
     /**
      * Mocked CRUD Service.
      */
-    CrudService<T, K, ID> getCrudService();
+    CrudService<K, ID> getCrudService();
 
     /**
      * Base controller path.
@@ -47,7 +47,7 @@ public interface CrudCreateControllerTest<T, K, ID> {
     /**
      * Single DTO element to return in mocked service.
      */
-    T getElement();
+    T getElementDto();
 
     @Test
     @WithMockUser
@@ -60,7 +60,7 @@ public interface CrudCreateControllerTest<T, K, ID> {
                 MockMvcRequestBuilders
                         .post(getBasePath() + CrudCreateController.ENDPOINT_CREATE)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(getObjectMapper().writeValueAsString(getElement()))
+                        .content(getObjectMapper().writeValueAsString(getElementDto()))
         );
 
         // Response validation

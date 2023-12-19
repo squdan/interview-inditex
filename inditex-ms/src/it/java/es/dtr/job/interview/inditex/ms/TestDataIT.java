@@ -1,10 +1,10 @@
 package es.dtr.job.interview.inditex.ms;
 
-import es.dtr.job.interview.commons.data.Currencies;
+import es.dtr.job.interview.commons.hexagonal.domain.entity.type.Currencies;
 import es.dtr.job.interview.commons.util.DateTimeUtils;
-import es.dtr.job.interview.inditex.ms.domain.service.brand.BrandDto;
-import es.dtr.job.interview.inditex.ms.domain.service.price.PriceDto;
-import es.dtr.job.interview.inditex.ms.domain.service.product.ProductDto;
+import es.dtr.job.interview.inditex.ms.application.rest.brand.BrandDto;
+import es.dtr.job.interview.inditex.ms.application.rest.price.PriceDto;
+import es.dtr.job.interview.inditex.ms.application.rest.product.ProductDto;
 
 import java.math.BigDecimal;
 

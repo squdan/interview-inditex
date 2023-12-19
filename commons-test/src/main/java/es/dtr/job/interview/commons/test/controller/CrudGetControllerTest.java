@@ -1,7 +1,8 @@
 package es.dtr.job.interview.commons.test.controller;
 
-import es.dtr.job.interview.commons.api.crud.CrudGetController;
-import es.dtr.job.interview.commons.service.crud.CrudService;
+import es.dtr.job.interview.commons.hexagonal.application.rest.crud.CrudControllerMapper;
+import es.dtr.job.interview.commons.hexagonal.application.rest.crud.CrudGetController;
+import es.dtr.job.interview.commons.hexagonal.domain.service.crud.CrudService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,6 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface CrudGetControllerTest<T, K, ID> {
@@ -27,7 +27,12 @@ public interface CrudGetControllerTest<T, K, ID> {
     /**
      * Mocked CRUD Service.
      */
-    CrudService<T, K, ID> getCrudService();
+    CrudService<K, ID> getCrudService();
+
+    /**
+     * Mocked CRUD Mapper.
+     */
+    CrudControllerMapper<T, K> getCrudMapper();
 
     /**
      * Base controller path.
@@ -46,64 +51,22 @@ public interface CrudGetControllerTest<T, K, ID> {
     /**
      * Single DTO element to return in mocked service.
      */
-    T getElement();
+    T getElementDto();
+
+    /**
+     * Single DTO element to return in mocked service.
+     */
+    K getElementEntity();
 
     /**
      * List of DTO elements to return in mocked service.
      */
-    List<T> getElements();
-
-    /**
-     * List of ResultMatchers to validate REST service response of List elements.
-     */
-    List<ResultMatcher> getElementsTestMatchers();
+    List<T> getElementsDto();
 
     /**
      * ResultMatcher to validate REST service response of single element.
      */
     List<ResultMatcher> getElementTestMatchers();
-
-    @Test
-    @WithMockUser
-    default void test_getAll_whenNoData_thenEmptyResponse() throws Exception {
-        // Mocks
-        Mockito.when(getCrudService().getAll()).thenReturn(new ArrayList<>());
-
-        // Test execution
-        final ResultActions restResponse = getMockMvc().perform(
-                MockMvcRequestBuilders
-                        .get(getBasePath() + CrudGetController.ENDPOINT_GET_ALL)
-        );
-
-        // Response validation
-        restResponse
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(0)));
-    }
-
-    @Test
-    @WithMockUser
-    default void test_getAll_whenData_thenResponseWithData() throws Exception {
-        // Mocks
-        Mockito.when(getCrudService().getAll()).thenReturn(getElements());
-
-        // Test execution
-        final ResultActions restResponse = getMockMvc().perform(
-                MockMvcRequestBuilders
-                        .get(getBasePath() + CrudGetController.ENDPOINT_GET_ALL)
-        );
-
-        // Response validation
-        restResponse
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(getElements().size())));
-
-        if (CollectionUtils.isNotEmpty(getElementsTestMatchers())) {
-            for (ResultMatcher matcher : getElementsTestMatchers()) {
-                restResponse.andExpect(matcher);
-            }
-        }
-    }
 
     @Test
     @WithMockUser
@@ -128,7 +91,8 @@ public interface CrudGetControllerTest<T, K, ID> {
     @WithMockUser
     default void test_get_whenExists_thenResponseWithElement() throws Exception {
         // Mocks
-        Mockito.when(getCrudService().get(Mockito.any())).thenReturn(getElement());
+        Mockito.when(getCrudService().get(Mockito.any())).thenReturn(this.getElementEntity());
+        Mockito.when(getCrudMapper().domainEntityToDto(this.getElementEntity())).thenReturn(this.getElementDto());
 
         // Test execution
         final ResultActions restResponse = getMockMvc().perform(

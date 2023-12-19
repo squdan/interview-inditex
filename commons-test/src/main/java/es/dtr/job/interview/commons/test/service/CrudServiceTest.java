@@ -1,9 +1,10 @@
 package es.dtr.job.interview.commons.test.service;
 
-public interface CrudServiceTest<T, K, ID> extends
-        CrudGetServiceTest<T, K, ID>,
-        CrudCreateServiceTest<T, K, ID>,
-        CrudUpdateServiceTest<T, K, ID>,
-        CrudDeleteServiceTest<T, K, ID> {
+public interface CrudServiceTest<T, ID> extends
+        CrudGetServiceTest<T, ID>,
+        CrudFindServiceTest<T, ID>,
+        CrudCreateServiceTest<T, ID>,
+        CrudUpdateServiceTest<T, ID>,
+        CrudDeleteServiceTest<T, ID> {
 
 }

@@ -1,6 +1,6 @@
 package es.dtr.job.interview.commons.it.controller;
 
-import es.dtr.job.interview.commons.api.crud.CrudFindController;
+import es.dtr.job.interview.commons.hexagonal.application.rest.crud.CrudFindController;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -53,6 +53,11 @@ public interface CrudFindControllerIT<T, K, ID> {
      */
     List<ResultMatcher> getFindByTestMatchers();
 
+    /**
+     * ResultMatcher to validate operation FIND_BY when no filters received and returns all results.
+     */
+    List<ResultMatcher> getFindByNoFiltersTestMatchers();
+
     @Test
     @WithMockUser
     default void test_findBy_whenFieldError_thenEmptyResponse() throws Exception {
@@ -86,7 +91,27 @@ public interface CrudFindControllerIT<T, K, ID> {
 
     @Test
     @WithMockUser
-    default void test_findBy_whenData_thenResponseWithData() throws Exception {
+    default void test_findBy_whenNoFilters_thenResponseWithData() throws Exception {
+        // Test execution
+        final ResultActions restResponse = getMockMvc().perform(
+                MockMvcRequestBuilders
+                        .get(getBasePath() + CrudFindController.ENDPOINT_FIND_BY)
+        );
+
+        // Response validation
+        restResponse
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        if (CollectionUtils.isNotEmpty(getFindByNoFiltersTestMatchers())) {
+            for (ResultMatcher matcher : getFindByNoFiltersTestMatchers()) {
+                restResponse.andExpect(matcher);
+            }
+        }
+    }
+
+    @Test
+    @WithMockUser
+    default void test_findBy_whenCorrectFilters_thenResponseWithData() throws Exception {
         // Test execution
         final ResultActions restResponse = getMockMvc().perform(
                 MockMvcRequestBuilders

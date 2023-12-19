@@ -1,7 +1,7 @@
 package es.dtr.job.interview.commons;
 
-import es.dtr.job.interview.commons.api.querydsl.QueryDslFilter;
-import es.dtr.job.interview.commons.api.querydsl.QueryDslOperators;
+import es.dtr.job.interview.commons.hexagonal.domain.service.querydsl.QueryDslFilter;
+import es.dtr.job.interview.commons.hexagonal.domain.service.querydsl.QueryDslOperators;
 
 import java.time.Instant;
 import java.util.List;

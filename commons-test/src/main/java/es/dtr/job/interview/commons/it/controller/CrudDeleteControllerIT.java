@@ -1,7 +1,7 @@
 package es.dtr.job.interview.commons.it.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.dtr.job.interview.commons.api.crud.CrudDeleteController;
+import es.dtr.job.interview.commons.hexagonal.application.rest.crud.CrudDeleteController;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;

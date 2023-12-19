@@ -1,111 +1,45 @@
 package es.dtr.job.interview.inditex.ms.domain.service.user;
 
-import es.dtr.job.interview.commons.api.querydsl.QueryDslFilter;
-import es.dtr.job.interview.commons.api.querydsl.QueryDslUtils;
-import es.dtr.job.interview.commons.data.Roles;
-import es.dtr.job.interview.commons.service.ServiceException;
-import es.dtr.job.interview.commons.service.crud.CrudGetService;
-import es.dtr.job.interview.commons.service.crud.CrudService;
-import es.dtr.job.interview.inditex.ms.adapter.out.database.hibernate.UserRepository;
-import es.dtr.job.interview.inditex.ms.configuration.security.SecurityUtils;
+import es.dtr.job.interview.commons.hexagonal.domain.entity.type.Roles;
+import es.dtr.job.interview.commons.hexagonal.domain.service.ServiceException;
+import es.dtr.job.interview.commons.hexagonal.domain.service.crud.CrudService;
 import es.dtr.job.interview.inditex.ms.domain.entity.UserEntity;
-import es.dtr.job.interview.inditex.ms.domain.service.user.dto.PasswordUpdateDto;
-import es.dtr.job.interview.inditex.ms.domain.service.user.dto.UserDto;
-import es.dtr.job.interview.inditex.ms.domain.service.user.dto.UserRegisterRequest;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
+import es.dtr.job.interview.inditex.ms.domain.repository.UserDomainRepository;
+import es.dtr.job.interview.inditex.ms.infrastructure.configuration.security.SecurityUtils;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Getter
-@Service
 @RequiredArgsConstructor
-public class UserService implements CrudService<UserDto, UserEntity, UUID> {
+public class UserService implements CrudService<UserEntity, UUID> {
 
-    // Dependencias
-    private final UserMapper mapper;
-    private final UserRepository repository;
-    private final QueryDslUtils queryDslUtils;
+    // Dependencies
+    private final UserDomainRepository repository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public List<UserDto> findBy(final List<String> filters) {
-        return findBy(filters, null);
-    }
-
-    @Override
-    public List<UserDto> findBy(final List<String> filters, final Pageable pageable) {
-        List<UserDto> result = new ArrayList<>();
-
-        // Prepare received queryDslFilters
-        final List<QueryDslFilter> queryDslFilters = queryDslUtils.prepareFilters(filters);
-
-        // Execute search
-        final List<UserEntity> mayElements = repository.findAll(UserEntity.class, queryDslFilters, pageable);
-
-        if (CollectionUtils.isNotEmpty(mayElements)) {
-            result = mapper.entityToDto(mayElements);
-        }
-
-        return result;
-    }
-
-    @Override
-    public UUID create(final UserDto createRequest) {
-        // Create user must be customized, we cant use default method
-        throw CrudService.NOT_IMPLEMENTED;
-    }
-
-    public UUID create(@NotNull @Valid final UserRegisterRequest createRequest) {
-        final UserEntity elementToCreate = mapper.createDtoToEntity(createRequest);
-
+    public UUID create(final UserEntity createRequest) {
         // If logged user is not an admin, no admins users are allowed to be created
         if (!SecurityUtils.getLoggedUserRole().equals(Roles.ADMIN)) {
-            elementToCreate.setRole(Roles.USER);
+            createRequest.setRole(Roles.USER);
         }
 
-        return getRepository().save(elementToCreate).getId();
+        return getRepository().create(createRequest);
     }
 
-    @Override
-    public void update(final UUID id, final UserDto updateRequest) {
-        final Optional<UserEntity> existingUser = repository.findById(id);
+    public void updatePassword(final UUID id, final PasswordUpdateDto passwordChangeRequest) {
+        final UserEntity user = repository.get(id);
 
-        if (existingUser.isEmpty()) {
-            throw NOT_FOUND;
+        // Check old password received is correct
+        if (passwordEncoder.matches(passwordChangeRequest.getOldPassword(), user.getPassword())) {
+            user.setPassword(passwordChangeRequest.getNewPassword());
+            repository.update(id, user);
         } else {
-            final UserEntity elementChanges = getMapper().dtoToEntity(updateRequest);
-            existingUser.get().merge(elementChanges);
-            repository.save(existingUser.get());
-        }
-    }
-
-    public void updatePassword(@NotNull @Valid final UUID id,
-                               @NotNull @Valid final PasswordUpdateDto passwordChangeRequest) {
-        final Optional<UserEntity> mayUser = repository.findById(id);
-
-        if (mayUser.isEmpty()) {
-            throw CrudGetService.NOT_FOUND;
-        } else {
-            // Check old password received is correct
-            if (passwordEncoder.matches(passwordChangeRequest.getOldPassword(), mayUser.get().getPassword())) {
-                final UserEntity entityChanges = mayUser.get();
-                entityChanges.setPassword(passwordChangeRequest.getNewPassword());
-                repository.save(entityChanges);
-            } else {
-                throw new ServiceException("Wrong password.", HttpStatus.BAD_REQUEST);
-            }
+            throw new ServiceException("Wrong password.", HttpStatus.BAD_REQUEST);
         }
     }
 

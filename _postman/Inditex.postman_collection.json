@@ -15,37 +15,6 @@
 					"name": "Users",
 					"item": [
 						{
-							"name": "Get All",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"A 200 is returned\", () => {\r",
-											"    pm.expect(pm.response.to.have.status(200))\r",
-											"})"
-										],
-										"type": "text/javascript"
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/{{apiVersion}}/users",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"{{apiVersion}}",
-										"users"
-									]
-								}
-							},
-							"response": []
-						},
-						{
 							"name": "Get",
 							"request": {
 								"method": "GET",
@@ -89,14 +58,13 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{baseUrl}}/{{apiVersion}}/users/search?filters=contains(email : gmail), role=ADMIN",
+									"raw": "{{baseUrl}}/{{apiVersion}}/users?filters=contains(email : gmail), role=ADMIN",
 									"host": [
 										"{{baseUrl}}"
 									],
 									"path": [
 										"{{apiVersion}}",
-										"users",
-										"search"
+										"users"
 									],
 									"query": [
 										{
