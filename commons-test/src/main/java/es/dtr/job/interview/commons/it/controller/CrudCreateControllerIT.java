@@ -2,6 +2,7 @@ package es.dtr.job.interview.commons.it.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.dtr.job.interview.commons.hexagonal.application.rest.crud.CrudCreateController;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -34,7 +35,7 @@ public interface CrudCreateControllerIT<T, K, ID> {
 
     @Test
     @WithMockUser
-    default void test_create_whenOk_thenReturnId() throws Exception {
+    default void test_create_whenOk_thenReturnElementCreated() throws Exception {
         // Test execution
         final ResultActions restResponse = getMockMvc().perform(
                 MockMvcRequestBuilders
@@ -45,6 +46,7 @@ public interface CrudCreateControllerIT<T, K, ID> {
 
         // Response validation
         restResponse
-                .andExpect(MockMvcResultMatchers.status().isCreated());
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.notNullValue()));
     }
 }

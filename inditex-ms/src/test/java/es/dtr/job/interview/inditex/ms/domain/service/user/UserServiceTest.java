@@ -40,17 +40,17 @@ class UserServiceTest implements CrudServiceTest<UserEntity, UUID> {
     @Override
     public void test_create_whenOk_thenReturnId() {
         // Mocks
-        Mockito.when(crudRepository.create(getElementEntity())).thenReturn(getRequestId());
+        Mockito.when(crudRepository.create(getElementEntity())).thenReturn(getElementEntity());
 
         // Authentication Mock
         SecurityTestUtils.authenticateAsAdmin();
 
         // Test execution
-        final UUID elementId = crudService.create(getElementEntity());
+        final UserEntity element = crudService.create(getElementEntity());
 
         // Response validation
-        Assertions.assertTrue(Objects.nonNull(elementId));
-        Assertions.assertEquals(getRequestId(), elementId);
+        Assertions.assertTrue(Objects.nonNull(element));
+        Assertions.assertEquals(getElementEntity(), element);
     }
 
     @Test

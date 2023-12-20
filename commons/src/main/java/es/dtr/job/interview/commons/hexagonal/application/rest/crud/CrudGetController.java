@@ -9,6 +9,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,12 +29,16 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @param <K>  Entity.
  * @param <ID> ID type.
  */
-public interface CrudGetController<T, K, ID> {
+public interface CrudGetController<T extends CrudElementDto<T, ID>, K, ID> {
 
     // Constants
     String ENDPOINT_GET = "/{id}";
 
     // Dependencies
+    Link[] getHateoas(ID id);
+
+    Class<? extends CrudGetController<T, K, ID>> getCrudController();
+
     CrudService<K, ID> getCrudService();
 
     CrudControllerMapper<T, K> getMapper();
@@ -45,10 +52,13 @@ public interface CrudGetController<T, K, ID> {
     })
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = CrudGetController.ENDPOINT_GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    default ResponseEntity<T> get(@NotNull @PathVariable final ID id) {
+    default ResponseEntity<EntityModel<T>> get(@NotNull @PathVariable final ID id) {
         final K element = getCrudService().get(id);
         final T result = getMapper().domainEntityToDto(element);
-        return ResponseEntity.ok().body(result);
+        return ResponseEntity.ok(EntityModel.of(result, getHateoas(id)));
     }
 
+    default Link getHateoasGet(final ID id) {
+        return WebMvcLinkBuilder.linkTo(getCrudController()).slash(id).withSelfRel();
+    }
 }

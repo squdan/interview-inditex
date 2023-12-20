@@ -9,6 +9,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,12 +30,16 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @param <K>  Entity.
  * @param <ID> ID type.
  */
-public interface CrudUpdateController<T, K, ID> {
+public interface CrudUpdateController<T extends CrudElementDto<T, ID>, K, ID> {
 
     // Constants
     String ENDPOINT_UPDATE = "/{id}";
 
     // Dependencies
+    Link[] getHateoas(ID id);
+
+    Class<? extends CrudUpdateController<T, K, ID>> getCrudController();
+
     CrudService<K, ID> getCrudService();
 
     CrudControllerMapper<T, K> getMapper();
@@ -43,13 +50,22 @@ public interface CrudUpdateController<T, K, ID> {
             @ApiResponse(responseCode = "403", description = "Authentication required.", content = @Content),
             @ApiResponse(responseCode = "404", description = "Element not found.", content = @Content)
     })
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = CrudUpdateController.ENDPOINT_UPDATE, produces = MediaType.APPLICATION_JSON_VALUE)
-    default ResponseEntity<Void> update(@NotNull @PathVariable final ID id,
-                                        @NotNull @Valid @RequestBody final T updateRequest) {
+    default ResponseEntity<EntityModel<T>> update(@NotNull @PathVariable final ID id,
+                                                  @NotNull @Valid @RequestBody final T updateRequest) {
         final K domainUpdateRequest = getMapper().dtoToDomainEntity(updateRequest);
-        getCrudService().update(id, domainUpdateRequest);
-        return ResponseEntity.noContent().build();
+        final K domainUpdateResponse = getCrudService().update(id, domainUpdateRequest);
+        final T updateDtoResponse = getMapper().domainEntityToDto(domainUpdateResponse);
+        return ResponseEntity.ok(EntityModel.of(updateDtoResponse, getHateoas(updateDtoResponse.getId())));
     }
 
+    default Link getHateoasUpdate(final ID id) {
+        return WebMvcLinkBuilder
+                .linkTo(
+                        WebMvcLinkBuilder
+                                .methodOn(getCrudController())
+                                .update(id, null))
+                .withRel("update");
+    }
 }

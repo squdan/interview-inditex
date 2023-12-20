@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductController implements ProductControllerInterface {
 
     // Dependencies
+    private final Class<ProductController> crudController = ProductController.class;
     private final ProductService crudService;
     private final ProductControllerMapper mapper;
 

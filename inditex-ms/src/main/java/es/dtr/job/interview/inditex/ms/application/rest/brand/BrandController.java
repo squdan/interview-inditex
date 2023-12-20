@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class BrandController implements BrandControllerInterface {
 
     // Dependencies
+    private final Class<BrandController> crudController = BrandController.class;
     private final BrandService crudService;
     private final BrandControllerMapper mapper;
 

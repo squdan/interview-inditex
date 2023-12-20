@@ -12,7 +12,7 @@ public interface CrudCreateService<T, ID> {
     // Dependencies
     CrudDomainRepository<T, ID> getRepository();
 
-    default ID create(final T createRequest) {
+    default T create(final T createRequest) {
         return getRepository().create(createRequest);
     }
 }

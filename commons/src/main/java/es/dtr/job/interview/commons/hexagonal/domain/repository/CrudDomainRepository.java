@@ -15,9 +15,9 @@ public interface CrudDomainRepository<T, ID> {
 
     List<T> findBy(List<QueryDslFilter> filters, Pageable pageable);
 
-    ID create(T createRequest);
+    T create(T createRequest);
 
-    void update(ID id, T updateRequest);
+    T update(ID id, T updateRequest);
 
     void delete(ID id);
 

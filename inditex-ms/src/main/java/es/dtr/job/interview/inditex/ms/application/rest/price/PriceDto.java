@@ -1,12 +1,10 @@
 package es.dtr.job.interview.inditex.ms.application.rest.price;
 
+import es.dtr.job.interview.commons.hexagonal.application.rest.crud.CrudElementDto;
 import es.dtr.job.interview.commons.hexagonal.domain.entity.type.Currencies;
 import es.dtr.job.interview.inditex.ms.application.rest.brand.BrandDto;
 import es.dtr.job.interview.inditex.ms.application.rest.product.ProductDto;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -15,7 +13,8 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PriceDto {
+@EqualsAndHashCode(callSuper = false)
+public class PriceDto extends CrudElementDto<PriceDto, Long> {
 
     private Long priceList;
     private BrandDto brand;
@@ -28,4 +27,8 @@ public class PriceDto {
     private Instant createdOn;
     private Instant lastUpdatedOn;
 
+    @Override
+    public Long getId() {
+        return this.priceList;
+    }
 }

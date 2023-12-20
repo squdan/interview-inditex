@@ -22,7 +22,7 @@ public class UserService implements CrudService<UserEntity, UUID> {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public UUID create(final UserEntity createRequest) {
+    public UserEntity create(final UserEntity createRequest) {
         // If logged user is not an admin, no admins users are allowed to be created
         if (!SecurityUtils.getLoggedUserRole().equals(Roles.ADMIN)) {
             createRequest.setRole(Roles.USER);
@@ -31,13 +31,14 @@ public class UserService implements CrudService<UserEntity, UUID> {
         return getRepository().create(createRequest);
     }
 
-    public void updatePassword(final UUID id, final PasswordUpdateDto passwordChangeRequest) {
+    public UserEntity updatePassword(final UUID id, final PasswordUpdateDto passwordChangeRequest) {
         final UserEntity user = repository.get(id);
 
         // Check old password received is correct
         if (passwordEncoder.matches(passwordChangeRequest.getOldPassword(), user.getPassword())) {
             user.setPassword(passwordChangeRequest.getNewPassword());
             repository.update(id, user);
+            return user;
         } else {
             throw new ServiceException("Wrong password.", HttpStatus.BAD_REQUEST);
         }

@@ -1,10 +1,9 @@
 package es.dtr.job.interview.inditex.ms.application.rest.product;
 
+import es.dtr.job.interview.commons.hexagonal.application.rest.crud.CrudElementDto;
 import es.dtr.job.interview.inditex.ms.application.rest.price.PriceDto;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.time.Instant;
 import java.util.List;
@@ -13,7 +12,8 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductDto {
+@EqualsAndHashCode(callSuper = false)
+public class ProductDto extends CrudElementDto<ProductDto, Long> {
 
     private Long id;
     private String name;

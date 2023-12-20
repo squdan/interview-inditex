@@ -1,7 +1,6 @@
 package es.dtr.job.interview.commons.hexagonal.infrastructure.database;
 
 import es.dtr.job.interview.commons.hexagonal.domain.repository.CrudDomainRepository;
-import es.dtr.job.interview.commons.hexagonal.domain.repository.CrudInfraRepository;
 import es.dtr.job.interview.commons.hexagonal.domain.service.querydsl.QueryDslFilter;
 import jakarta.persistence.Id;
 import org.springframework.data.domain.Page;
@@ -47,22 +46,14 @@ public interface CrudPortRepository<T, K, ID> extends CrudDomainRepository<T, ID
     }
 
     @Override
-    default ID create(final T createRequest) {
+    default T create(final T createRequest) {
         final K infraEntity = getRepositoryMapper().entityDomainToEntityInfra(createRequest);
         final K elementCreated = getCrudInfraRepository().save(infraEntity);
-
-        // Search id from created element
-        try {
-            final Field fieldId = getIdFieldFromEntity(elementCreated);
-            fieldId.setAccessible(true);
-            return (ID) fieldId.get(elementCreated);
-        } catch (final IllegalAccessException e) {
-            throw new RepositoryInfraException(e, "Error accessing to field ID.", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return getRepositoryMapper().entityInfraToEntityDomain(elementCreated);
     }
 
     @Override
-    default void update(final ID id, final T updateRequest) {
+    default T update(final ID id, final T updateRequest) {
         final Optional<K> existingEntity = getCrudInfraRepository().findById(id);
 
         if (existingEntity.isEmpty()) {
@@ -80,6 +71,7 @@ public interface CrudPortRepository<T, K, ID> extends CrudDomainRepository<T, ID
                 fieldId.setAccessible(true);
                 fieldId.set(elementToUpdate, id);
                 getCrudInfraRepository().save(elementToUpdate);
+                return getRepositoryMapper().entityInfraToEntityDomain(elementToUpdate);
             } catch (final IllegalAccessException e) {
                 throw new RepositoryInfraException(e, "Error accessing to field ID.", HttpStatus.INTERNAL_SERVER_ERROR);
             }

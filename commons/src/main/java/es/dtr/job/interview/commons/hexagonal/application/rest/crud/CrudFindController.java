@@ -11,7 +11,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +35,7 @@ import java.util.List;
  * @param <K>  Entity.
  * @param <ID> ID type.
  */
-public interface CrudFindController<T, K, ID> {
+public interface CrudFindController<T extends CrudElementDto<T, ID>, K, ID> {
 
     // Constants
     String QUERY_FILTER_PARAM = "filters";
@@ -39,6 +43,10 @@ public interface CrudFindController<T, K, ID> {
 
     // Dependencies
     QueryDslUtils QUERY_DSL_UTILS = new QueryDslUtils();
+
+    Link[] getHateoas(ID id);
+
+    Class<? extends CrudFindController<T, K, ID>> getCrudController();
 
     CrudService<K, ID> getCrudService();
 
@@ -61,7 +69,22 @@ public interface CrudFindController<T, K, ID> {
         final List<QueryDslFilter> queryDslFilters = QUERY_DSL_UTILS.prepareFilters(filters);
         final List<K> elements = getCrudService().findBy(queryDslFilters, pageable);
         final List<T> result = getMapper().domainEntityToDto(elements);
+
+        if (CollectionUtils.isNotEmpty(result)) {
+            result.forEach(r -> {
+                r.add(getHateoas(r.getId()));
+            });
+        }
+
         return ResponseEntity.ok().body(result);
     }
 
+    default Link getHateoasFind() {
+        return WebMvcLinkBuilder
+                .linkTo(
+                        WebMvcLinkBuilder
+                                .methodOn(getCrudController())
+                                .findBy(null, PageRequest.of(0, 1)))
+                .withRel("find");
+    }
 }

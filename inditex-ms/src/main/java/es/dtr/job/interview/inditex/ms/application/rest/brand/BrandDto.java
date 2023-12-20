@@ -1,10 +1,8 @@
 package es.dtr.job.interview.inditex.ms.application.rest.brand;
 
+import es.dtr.job.interview.commons.hexagonal.application.rest.crud.CrudElementDto;
 import es.dtr.job.interview.inditex.ms.application.rest.price.PriceDto;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.List;
@@ -13,7 +11,8 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BrandDto {
+@EqualsAndHashCode(callSuper = false)
+public class BrandDto extends CrudElementDto<BrandDto, Long> {
 
     private Long id;
     private String name;

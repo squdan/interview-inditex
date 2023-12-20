@@ -13,7 +13,7 @@ public interface CrudUpdateService<T, ID> {
     // Dependencies
     CrudDomainRepository<T, ID> getRepository();
 
-    default void update(final ID id, final T updateRequest) {
-        getRepository().update(id, updateRequest);
+    default T update(final ID id, final T updateRequest) {
+        return getRepository().update(id, updateRequest);
     }
 }

@@ -7,10 +7,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * This interface will generate CRUD REST DELETE services for selected resource.
@@ -18,16 +22,20 @@ import org.springframework.web.bind.annotation.*;
  * Note: This generated CRUD SERVICES just require user authentication, not a specific user ROLE, if you require
  * to limit users access by role, define manually your service and use @PreAuthorize("hasRole('XXX')").
  *
- * @param <T> DTO.
- * @param <K> Entity.
+ * @param <T>  DTO.
+ * @param <K>  Entity.
  * @param <ID> ID type.
  */
-public interface CrudDeleteController<T, K, ID> {
+public interface CrudDeleteController<T extends CrudElementDto<T, ID>, K, ID> {
 
     // Constants
     String ENDPOINT_DELETE = "/{id}";
 
     // Dependencies
+    Link[] getHateoas(ID id);
+
+    Class<? extends CrudDeleteController<T, K, ID>> getCrudController();
+
     CrudService<K, ID> getCrudService();
 
     @Operation(summary = "Delete selected element.", security = @SecurityRequirement(name = ApiConfiguration.API_SECURITY_NAME))
@@ -43,4 +51,12 @@ public interface CrudDeleteController<T, K, ID> {
         return ResponseEntity.noContent().build();
     }
 
+    default Link getHateoasDelete(final ID id) {
+        return WebMvcLinkBuilder
+                .linkTo(
+                        WebMvcLinkBuilder
+                                .methodOn(getCrudController())
+                                .delete(id))
+                .withRel("delete");
+    }
 }

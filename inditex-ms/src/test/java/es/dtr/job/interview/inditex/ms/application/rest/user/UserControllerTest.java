@@ -66,6 +66,11 @@ class UserControllerTest extends ControllerBaseTest implements
                 .phone(TestData.TEST_PHONE)
                 .build();
 
+        // Mocks
+        Mockito.when(crudService.create(getElementEntity())).thenReturn(getElementEntity());
+        Mockito.when(getCrudMapper().registerRequestToEntity(registerRequest)).thenReturn(getElementEntity());
+        Mockito.when(getCrudMapper().domainEntityToDto(getElementEntity())).thenReturn(getElementDto());
+
         // Test execution
         final ResultActions restResponse = mockMvc.perform(
                 MockMvcRequestBuilders
@@ -108,6 +113,10 @@ class UserControllerTest extends ControllerBaseTest implements
         // Test data
         final PasswordUpdateDto passwordUpdateRequest = PasswordUpdateDto.builder().oldPassword(TestData.TEST_STRING).newPassword("newPassword").build();
 
+        // Mocks
+        Mockito.when(getCrudService().updatePassword(getRequestId(), passwordUpdateRequest)).thenReturn(getElementEntity());
+        Mockito.when(getCrudMapper().domainEntityToDto(getElementEntity())).thenReturn(getElementDto());
+
         // Test execution
         final ResultActions restResponse = mockMvc.perform(
                 MockMvcRequestBuilders
@@ -118,7 +127,7 @@ class UserControllerTest extends ControllerBaseTest implements
 
         // Response validation
         restResponse
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Override

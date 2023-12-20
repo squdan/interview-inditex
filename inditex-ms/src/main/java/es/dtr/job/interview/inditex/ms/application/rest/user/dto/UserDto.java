@@ -1,10 +1,8 @@
 package es.dtr.job.interview.inditex.ms.application.rest.user.dto;
 
+import es.dtr.job.interview.commons.hexagonal.application.rest.crud.CrudElementDto;
 import es.dtr.job.interview.commons.hexagonal.domain.entity.type.Roles;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -13,7 +11,8 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
+@EqualsAndHashCode(callSuper = false)
+public class UserDto extends CrudElementDto<UserDto, UUID> {
 
     private UUID id;
     private String username;

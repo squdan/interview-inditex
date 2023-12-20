@@ -120,7 +120,9 @@ class UserControllerIT extends ControllerBaseIT implements
 
         // Response validation
         restResponse
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.notNullValue()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.equalTo(getRequestId().toString())));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package es.dtr.job.interview.commons.test.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import es.dtr.job.interview.commons.hexagonal.application.rest.crud.CrudControllerMapper;
 import es.dtr.job.interview.commons.hexagonal.application.rest.crud.CrudCreateController;
 import es.dtr.job.interview.commons.hexagonal.domain.service.crud.CrudService;
 import org.hamcrest.Matchers;
@@ -31,6 +32,11 @@ public interface CrudCreateControllerTest<T, K, ID> {
     CrudService<K, ID> getCrudService();
 
     /**
+     * Mocked CRUD Mapper.
+     */
+    CrudControllerMapper<T, K> getCrudMapper();
+
+    /**
      * Base controller path.
      */
     String getBasePath();
@@ -49,11 +55,17 @@ public interface CrudCreateControllerTest<T, K, ID> {
      */
     T getElementDto();
 
+    /**
+     * Single DTO element to return in mocked service.
+     */
+    K getElementEntity();
+
     @Test
     @WithMockUser
     default void test_create_whenOk_thenReturnId() throws Exception {
         // Mocks
-        Mockito.when(getCrudService().create(Mockito.any())).thenReturn(getRequestId());
+        Mockito.when(getCrudService().create(Mockito.any())).thenReturn(getElementEntity());
+        Mockito.when(getCrudMapper().domainEntityToDto(getElementEntity())).thenReturn(getElementDto());
 
         // Test execution
         final ResultActions restResponse = getMockMvc().perform(

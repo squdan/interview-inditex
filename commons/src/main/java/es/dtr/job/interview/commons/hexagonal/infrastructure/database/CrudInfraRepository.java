@@ -1,4 +1,4 @@
-package es.dtr.job.interview.commons.hexagonal.domain.repository;
+package es.dtr.job.interview.commons.hexagonal.infrastructure.database;
 
 import com.querydsl.core.types.dsl.EntityPathBase;
 import es.dtr.job.interview.commons.hexagonal.domain.repository.querydsl.QueryDslRepository;

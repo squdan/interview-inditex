@@ -2,6 +2,7 @@ package es.dtr.job.interview.commons.it.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import es.dtr.job.interview.commons.hexagonal.application.rest.crud.CrudUpdateController;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -43,7 +44,7 @@ public interface CrudUpdateControllerIT<T, K, ID> {
 
     @Test
     @WithMockUser
-    default void test_update_whenElementExists_thenReturn204() throws Exception {
+    default void test_update_whenElementExists_thenReturnElementUpdated() throws Exception {
         // Test execution
         final ResultActions restResponse = getMockMvc().perform(
                 MockMvcRequestBuilders
@@ -54,6 +55,7 @@ public interface CrudUpdateControllerIT<T, K, ID> {
 
         // Response validation
         restResponse
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.notNullValue()));
     }
 }

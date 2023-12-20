@@ -37,13 +37,13 @@ public interface CrudCreateServiceTest<T, ID> {
     @Test
     default void test_create_whenOk_thenReturnId() {
         // Mocks
-        Mockito.when(getCrudRepository().create(getElementEntity())).thenReturn(getRequestId());
+        Mockito.when(getCrudRepository().create(getElementEntity())).thenReturn(getElementEntity());
 
         // Test execution
-        final ID elementId = getCrudService().create(getElementEntity());
+        final T element = getCrudService().create(getElementEntity());
 
         // Response validation
-        Assertions.assertTrue(Objects.nonNull(elementId));
-        Assertions.assertEquals(getRequestId(), elementId);
+        Assertions.assertTrue(Objects.nonNull(element));
+        Assertions.assertEquals(getElementEntity(), element);
     }
 }

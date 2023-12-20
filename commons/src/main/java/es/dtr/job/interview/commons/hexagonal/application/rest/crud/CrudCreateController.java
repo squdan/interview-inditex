@@ -10,6 +10,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,12 +30,16 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @param <K>  Entity.
  * @param <ID> ID type.
  */
-public interface CrudCreateController<T, K, ID> {
+public interface CrudCreateController<T extends CrudElementDto<T, ID>, K, ID> {
 
     // Constants
     String ENDPOINT_CREATE = "";
 
     // Dependencies
+    Link[] getHateoas(ID id);
+
+    Class<? extends CrudCreateController<T, K, ID>> getCrudController();
+
     CrudService<K, ID> getCrudService();
 
     CrudControllerMapper<T, K> getMapper();
@@ -45,10 +52,19 @@ public interface CrudCreateController<T, K, ID> {
     })
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = CrudCreateController.ENDPOINT_CREATE, produces = MediaType.APPLICATION_JSON_VALUE)
-    default ResponseEntity<ID> create(@NotNull @Valid @RequestBody final T createRequest) {
+    default ResponseEntity<EntityModel<T>> create(@NotNull @Valid @RequestBody final T createRequest) {
         final K createDomainRequest = getMapper().dtoToDomainEntity(createRequest);
-        final ID createdId = getCrudService().create(createDomainRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdId);
+        final K createdDomainResponse = getCrudService().create(createDomainRequest);
+        final T createdDtoResponse = getMapper().domainEntityToDto(createdDomainResponse);
+        return ResponseEntity.status(HttpStatus.CREATED).body(EntityModel.of(createdDtoResponse, getHateoas(createdDtoResponse.getId())));
     }
 
+    default Link getHateoasCreate() {
+        return WebMvcLinkBuilder
+                .linkTo(
+                        WebMvcLinkBuilder
+                                .methodOn(getCrudController())
+                                .create(null))
+                .withRel("create");
+    }
 }

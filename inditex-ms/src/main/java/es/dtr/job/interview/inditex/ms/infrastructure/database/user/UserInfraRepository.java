@@ -1,6 +1,6 @@
 package es.dtr.job.interview.inditex.ms.infrastructure.database.user;
 
-import es.dtr.job.interview.commons.hexagonal.domain.repository.CrudInfraRepository;
+import es.dtr.job.interview.commons.hexagonal.infrastructure.database.CrudInfraRepository;
 import es.dtr.job.interview.commons.hexagonal.domain.repository.querydsl.QueryDslCustomTypesManager;
 import org.springframework.stereotype.Repository;
 
