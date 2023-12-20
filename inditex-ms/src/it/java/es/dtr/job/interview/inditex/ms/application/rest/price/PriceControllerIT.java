@@ -39,7 +39,7 @@ class PriceControllerIT extends ControllerBaseIT implements CrudControllerIT<Pri
     private final String basePath = PriceControllerInterface.BASE_PATH;
 
     @Test
-    void test_getWith_withDay14_andTime10_thenReturnPrice1() throws Exception {
+    void test_getWith_day14_andTime10_thenReturnPrice1() throws Exception {
         // Test data
         final Long brandId = 1L;
         final Long productId = 35455L;
@@ -62,7 +62,7 @@ class PriceControllerIT extends ControllerBaseIT implements CrudControllerIT<Pri
     }
 
     @Test
-    void test_getWith_withDay14_andTime16_thenReturnPrice2() throws Exception {
+    void test_getWith_day14_andTime16_thenReturnPrice2() throws Exception {
         // Test data
         final Long brandId = 1L;
         final Long productId = 35455L;
@@ -85,7 +85,7 @@ class PriceControllerIT extends ControllerBaseIT implements CrudControllerIT<Pri
     }
 
     @Test
-    void test_getWith_withDay14_andTime21_thenReturnPrice1() throws Exception {
+    void test_getWith_day14_andTime21_thenReturnPrice1() throws Exception {
         // Test data
         final Long brandId = 1L;
         final Long productId = 35455L;
@@ -108,7 +108,7 @@ class PriceControllerIT extends ControllerBaseIT implements CrudControllerIT<Pri
     }
 
     @Test
-    void test_getWith_withDay15_andTime10_thenReturnPrice3() throws Exception {
+    void test_getWith_day15_andTime10_thenReturnPrice3() throws Exception {
         // Test data
         final Long brandId = 1L;
         final Long productId = 35455L;
@@ -131,7 +131,7 @@ class PriceControllerIT extends ControllerBaseIT implements CrudControllerIT<Pri
     }
 
     @Test
-    void test_getWith_withDay16_andTime21_thenReturnPrice4() throws Exception {
+    void test_getWith_day16_andTime21_thenReturnPrice4() throws Exception {
         // Test data
         final Long brandId = 1L;
         final Long productId = 35455L;

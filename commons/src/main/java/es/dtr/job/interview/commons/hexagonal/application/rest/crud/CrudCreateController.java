@@ -56,7 +56,9 @@ public interface CrudCreateController<T extends CrudElementDto<T, ID>, K, ID> {
         final K createDomainRequest = getMapper().dtoToDomainEntity(createRequest);
         final K createdDomainResponse = getCrudService().create(createDomainRequest);
         final T createdDtoResponse = getMapper().domainEntityToDto(createdDomainResponse);
-        return ResponseEntity.status(HttpStatus.CREATED).body(EntityModel.of(createdDtoResponse, getHateoas(createdDtoResponse.getId())));
+        return ResponseEntity
+                .created(WebMvcLinkBuilder.linkTo(getCrudController()).slash(createdDtoResponse.getId()).toUri())
+                .body(EntityModel.of(createdDtoResponse, getHateoas(createdDtoResponse.getId())));
     }
 
     default Link getHateoasCreate() {
