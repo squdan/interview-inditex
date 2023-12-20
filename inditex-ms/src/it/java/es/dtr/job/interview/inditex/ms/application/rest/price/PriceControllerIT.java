@@ -11,8 +11,10 @@ import es.dtr.job.interview.inditex.ms.application.rest.product.ProductDto;
 import es.dtr.job.interview.inditex.ms.domain.entity.PriceEntity;
 import lombok.Getter;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -27,6 +29,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Getter
 @SpringBootTest
@@ -38,36 +41,19 @@ class PriceControllerIT extends ControllerBaseIT implements CrudControllerIT<Pri
     // Configuration
     private final String basePath = PriceControllerInterface.BASE_PATH;
 
-    @Test
-    void test_getWith_day14_andTime10_thenReturnPrice1() throws Exception {
-        // Test data
-        final Long brandId = 1L;
-        final Long productId = 35455L;
-        final Instant date = DateTimeUtils.StringDateUtils.toInstantUtc("2020-06-14T10:00:00Z");
-
-        // Test execution
-        final ResultActions restResponse = getMockMvc().perform(
-                MockMvcRequestBuilders
-                        .get(
-                                getBasePath() + PriceControllerInterface.ENDPOINT_GET_PRICE_BY,
-                                productId, brandId, date
-                        )
+    private static Stream<Arguments> providePriceGetWithTestCases() {
+        return Stream.of(
+                Arguments.of(1L, 35455L, DateTimeUtils.StringDateUtils.toInstantUtc("2020-06-14T10:00:00Z"), TestDataIT.Prices.PRICE_1),
+                Arguments.of(1L, 35455L, DateTimeUtils.StringDateUtils.toInstantUtc("2020-06-14T16:00:00Z"), TestDataIT.Prices.PRICE_2),
+                Arguments.of(1L, 35455L, DateTimeUtils.StringDateUtils.toInstantUtc("2020-06-14T21:00:00Z"), TestDataIT.Prices.PRICE_1),
+                Arguments.of(1L, 35455L, DateTimeUtils.StringDateUtils.toInstantUtc("2020-06-15T10:00:00Z"), TestDataIT.Prices.PRICE_3),
+                Arguments.of(1L, 35455L, DateTimeUtils.StringDateUtils.toInstantUtc("2020-06-16T21:00:00Z"), TestDataIT.Prices.PRICE_4)
         );
-
-        // Response validation
-        restResponse
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        validatePriceResponse(restResponse, TestDataIT.Prices.PRICE_1);
     }
 
-    @Test
-    void test_getWith_day14_andTime16_thenReturnPrice2() throws Exception {
-        // Test data
-        final Long brandId = 1L;
-        final Long productId = 35455L;
-        final Instant date = DateTimeUtils.StringDateUtils.toInstantUtc("2020-06-14T16:00:00Z");
-
+    @ParameterizedTest
+    @MethodSource("providePriceGetWithTestCases")
+    void test_getWithProductBrandDate(final Long brandId, final Long productId, final Instant date, final PriceDto expectedPrice) throws Exception {
         // Test execution
         final ResultActions restResponse = getMockMvc().perform(
                 MockMvcRequestBuilders
@@ -81,76 +67,7 @@ class PriceControllerIT extends ControllerBaseIT implements CrudControllerIT<Pri
         restResponse
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        validatePriceResponse(restResponse, TestDataIT.Prices.PRICE_2);
-    }
-
-    @Test
-    void test_getWith_day14_andTime21_thenReturnPrice1() throws Exception {
-        // Test data
-        final Long brandId = 1L;
-        final Long productId = 35455L;
-        final Instant date = DateTimeUtils.StringDateUtils.toInstantUtc("2020-06-14T21:00:00Z");
-
-        // Test execution
-        final ResultActions restResponse = getMockMvc().perform(
-                MockMvcRequestBuilders
-                        .get(
-                                getBasePath() + PriceControllerInterface.ENDPOINT_GET_PRICE_BY,
-                                productId, brandId, date
-                        )
-        );
-
-        // Response validation
-        restResponse
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        validatePriceResponse(restResponse, TestDataIT.Prices.PRICE_1);
-    }
-
-    @Test
-    void test_getWith_day15_andTime10_thenReturnPrice3() throws Exception {
-        // Test data
-        final Long brandId = 1L;
-        final Long productId = 35455L;
-        final Instant date = DateTimeUtils.StringDateUtils.toInstantUtc("2020-06-15T10:00:00Z");
-
-        // Test execution
-        final ResultActions restResponse = getMockMvc().perform(
-                MockMvcRequestBuilders
-                        .get(
-                                getBasePath() + PriceControllerInterface.ENDPOINT_GET_PRICE_BY,
-                                productId, brandId, date
-                        )
-        );
-
-        // Response validation
-        restResponse
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        validatePriceResponse(restResponse, TestDataIT.Prices.PRICE_3);
-    }
-
-    @Test
-    void test_getWith_day16_andTime21_thenReturnPrice4() throws Exception {
-        // Test data
-        final Long brandId = 1L;
-        final Long productId = 35455L;
-        final Instant date = DateTimeUtils.StringDateUtils.toInstantUtc("2020-06-16T21:00:00Z");
-
-        // Test execution
-        final ResultActions restResponse = getMockMvc().perform(
-                MockMvcRequestBuilders
-                        .get(
-                                getBasePath() + PriceControllerInterface.ENDPOINT_GET_PRICE_BY,
-                                productId, brandId, date
-                        )
-        );
-
-        // Response validation
-        restResponse
-                .andExpect(MockMvcResultMatchers.status().isOk());
-
-        validatePriceResponse(restResponse, TestDataIT.Prices.PRICE_4);
+        validatePriceResponse(restResponse, expectedPrice);
     }
 
     private void validatePriceResponse(final ResultActions restResponse, final PriceDto expectedPrice) throws Exception {
